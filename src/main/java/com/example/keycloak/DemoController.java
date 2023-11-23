@@ -9,15 +9,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/demo")
 public class DemoController {
 
-    @GetMapping
+    @GetMapping("ooif")
     @PreAuthorize("hasRole('client_ooif')")
     public String hello() {
-        return "Hellp from SB and Keycloak";
+        return "Привет от ответственного ОИФ";
     }
 
-    @GetMapping("/hello2")
+    @GetMapping("/operd")
     @PreAuthorize("hasRole('client_operd')")
     public String hello2() {
-        return "Hellp from SB and Keycloak ADMIN";
+        return "Привет от Опер дежурного";
     }
 }

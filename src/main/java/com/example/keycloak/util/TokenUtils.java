@@ -3,14 +3,25 @@ package com.example.keycloak.util;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.experimental.UtilityClass;
-import org.springframework.stereotype.Component;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.util.StringUtils;
-import java.util.Base64;
+
+import java.io.IOException;
 import java.util.Map;
 
+/**
+ * Утилитный класс для работы с JWT токенами.
+ */
 @UtilityClass
 public class TokenUtils {
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+    /**
+     * Извлекает идентификатор пользователя из refresh токена.
+     *
+     * @param refreshToken Refresh токен, из которого нужно извлечь идентификатор пользователя.
+     * @return Идентификатор пользователя или null, если токен недействителен или возникла ошибка.
+     */
     public static String extractUserIdFromRefreshToken(String refreshToken) {
         if (!StringUtils.hasText(refreshToken)) {
             return null;
@@ -22,11 +33,12 @@ public class TokenUtils {
                 return null; // Неверный формат токена
             }
 
-            String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
-            Map<String, String> payloadMap = new ObjectMapper().readValue(payload, new TypeReference<>() {});
+            String payload = new String(Base64.decodeBase64(parts[1]));
+            Map<String, String> payloadMap = OBJECT_MAPPER.readValue(payload, new TypeReference<>() {
+            });
 
             return payloadMap.get("sub");
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return null; // Ошибка при декодировании или чтении JSON
         }

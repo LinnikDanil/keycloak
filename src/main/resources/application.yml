@@ -8,6 +8,7 @@ spring:
     redis:
       host: localhost  # ????? ??????? Redis
       port: 6379       # ???? ??????? Redis (??????????? ???? - 6379)
+
 server:
   port: 8081
 
@@ -16,7 +17,12 @@ jwt:
     converter:
       resource-id: testerp-rest-api
       principle-attribute: preferred_username
+
 keycloak:
   auth-server-url: http://localhost:8080
   realm: testERP
   resource: testerp-rest-api
+
+logging:
+  level:
+    org.springframework.security: DEBUG

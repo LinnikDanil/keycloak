@@ -4,6 +4,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+/**
+ * Класс для хранения данных токенов пользователя.
+ */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TokenData {

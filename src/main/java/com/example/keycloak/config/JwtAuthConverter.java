@@ -20,6 +20,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Конвертер для преобразования JWT в Authentication Token с учетом ролей и валидности.
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
@@ -33,9 +36,14 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
     @Value("${jwt.auth.converter.resource-id}")
     private String resourceId;
 
+    /**
+     * Конвертирует JWT в Authentication Token, проверяя его валидность и извлекая роли.
+     *
+     * @param jwt JWT для конвертации.
+     * @return Сформированный Authentication Token.
+     */
     @Override
     public AbstractAuthenticationToken convert(@NonNull Jwt jwt) {
-
         String token = jwt.getTokenValue();
         if (!tokenStoreService.isTokenValid(token)) {
             throw new InvalidTokenException("Token is invalid or has been revoked");
@@ -47,37 +55,33 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
                 )
                 .collect(Collectors.toSet());
 
-        return new JwtAuthenticationToken(
-                jwt,
-                authorities,
-                getPrincipleClaimName(jwt));
+        return new JwtAuthenticationToken(jwt, authorities, getPrincipleClaimName(jwt));
     }
 
-
+    /**
+     * Получает имя принципала из JWT.
+     *
+     * @param jwt JWT, из которого извлекается принципал.
+     * @return Имя принципала.
+     */
     private String getPrincipleClaimName(Jwt jwt) {
-        String claimName = JwtClaimNames.SUB;
-        if (principleAttribute != null) {
-            claimName = principleAttribute;
-        }
-        return jwt.getClaim(claimName);
+        return principleAttribute != null ? principleAttribute : JwtClaimNames.SUB;
     }
 
+    /**
+     * Извлекает роли из JWT.
+     *
+     * @param jwt JWT для извлечения ролей.
+     * @return Коллекция GrantedAuthority на основе ролей в JWT.
+     */
     private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt) {
-        Map<String, Object> resourceAccess;
-        Map<String, Object> resource;
-        Collection<String> resourceRoles;
-
-        if (jwt.getClaim("resource_access") == null) {
+        Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
+        if (resourceAccess == null || !resourceAccess.containsKey(resourceId)) {
             return Set.of();
         }
-        resourceAccess = jwt.getClaim("resource_access");
 
-        if (resourceAccess.get(resourceId) == null) {
-            return Set.of();
-        }
-        resource = (Map<String, Object>) resourceAccess.get(resourceId);
-
-        resourceRoles = (Collection<String>) resource.get("roles");
+        Map<String, Object> resource = (Map<String, Object>) resourceAccess.get(resourceId);
+        Collection<String> resourceRoles = (Collection<String>) resource.get("roles");
 
         return resourceRoles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
