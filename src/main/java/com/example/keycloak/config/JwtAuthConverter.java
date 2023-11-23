@@ -1,6 +1,8 @@
 package com.example.keycloak.config;
 
+import com.example.keycloak.service.TokenStoreService;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -19,9 +21,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+    private final TokenStoreService tokenStoreService;
 
     @Value("${jwt.auth.converter.principle-attribute}")
     private String principleAttribute;
@@ -31,6 +35,12 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
 
     @Override
     public AbstractAuthenticationToken convert(@NonNull Jwt jwt) {
+
+        String token = jwt.getTokenValue();
+        if (!tokenStoreService.isTokenValid(token)) {
+            throw new InvalidTokenException("Token is invalid or has been revoked");
+        }
+
         Collection<GrantedAuthority> authorities = Stream.concat(
                         jwtGrantedAuthoritiesConverter.convert(jwt).stream(),
                         extractResourceRoles(jwt).stream()
@@ -42,6 +52,7 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
                 authorities,
                 getPrincipleClaimName(jwt));
     }
+
 
     private String getPrincipleClaimName(Jwt jwt) {
         String claimName = JwtClaimNames.SUB;
