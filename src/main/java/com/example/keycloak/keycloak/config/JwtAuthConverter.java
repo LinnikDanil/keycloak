@@ -1,6 +1,6 @@
-package com.example.keycloak.config;
+package com.example.keycloak.keycloak.config;
 
-import com.example.keycloak.service.TokenStoreService;
+import com.example.keycloak.keycloak.service.TokenStoreService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +14,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,16 +73,23 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
      * @return Коллекция GrantedAuthority на основе ролей в JWT.
      */
     private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt) {
+        Collection<GrantedAuthority> authorities = new HashSet<>();
+
+        // Извлечение клиентских ролей
         Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
-        if (resourceAccess == null || !resourceAccess.containsKey(resourceId)) {
-            return Set.of();
+        if (resourceAccess != null) {
+            Map<String, Object> resource = (Map<String, Object>) resourceAccess.getOrDefault(resourceId, Collections.emptyMap());
+            Collection<String> resourceRoles = (Collection<String>) resource.getOrDefault("roles", Collections.emptyList());
+            resourceRoles.forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
         }
 
-        Map<String, Object> resource = (Map<String, Object>) resourceAccess.get(resourceId);
-        Collection<String> resourceRoles = (Collection<String>) resource.get("roles");
+        // Извлечение реалмовских ролей
+        Map<String, Object> realmAccess = jwt.getClaim("realm_access");
+        if (realmAccess != null) {
+            Collection<String> realmRoles = (Collection<String>) realmAccess.getOrDefault("roles", Collections.emptyList());
+            realmRoles.forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
+        }
 
-        return resourceRoles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                .collect(Collectors.toSet());
+        return authorities;
     }
 }

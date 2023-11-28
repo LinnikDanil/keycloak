@@ -1,4 +1,4 @@
-package com.example.keycloak.config;
+package com.example.keycloak.keycloak.config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +28,7 @@ public class SecurityConfig {
                 // Настройка правил авторизации запросов
                 .authorizeHttpRequests(configurer ->
                         configurer
-                                .requestMatchers("/auth/**").permitAll() // Разрешение всех запросов к "/auth/**"
+                                .requestMatchers("/auth/**", "/demo/unauthorized").permitAll() // Разрешение всех запросов к "/auth/**"
                                 .anyRequest().authenticated() // Все остальные запросы должны быть аутентифицированы
                 );
 

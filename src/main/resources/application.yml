@@ -6,8 +6,8 @@ spring:
           issuer-uri: http://localhost:8080/realms/testERP
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
     redis:
-      host: localhost  # ????? ??????? Redis
-      port: 6379       # ???? ??????? Redis (??????????? ???? - 6379)
+      host: localhost  # Адрес сервера Redis
+      port: 6379       # Порт сервера Redis (стандартный порт - 6379)
 
 server:
   port: 8081
@@ -22,7 +22,12 @@ keycloak:
   auth-server-url: http://localhost:8080
   realm: testERP
   resource: testerp-rest-api
+  admin-client:
+    client-id: admin-cli # ID вашего административного клиента в Keycloak
+    #client-secret: your-admin-cli-client-secret # Секрет вашего административного клиента
 
 logging:
   level:
     org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
+    org.keycloak: DEBUG

@@ -1,4 +1,4 @@
-package com.example.keycloak.util;
+package com.example.keycloak.keycloak.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

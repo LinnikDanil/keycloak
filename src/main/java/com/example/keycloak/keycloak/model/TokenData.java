@@ -1,4 +1,4 @@
-package com.example.keycloak.service;
+package com.example.keycloak.keycloak.model;
 
 import lombok.AccessLevel;
 import lombok.Data;
@@ -14,4 +14,5 @@ public class TokenData {
     String accessToken;
     String refreshToken;
     String role;
+    String fullName;
 }

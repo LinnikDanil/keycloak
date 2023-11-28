@@ -1,4 +1,4 @@
-package com.example.keycloak.service;
+package com.example.keycloak.keycloak.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;

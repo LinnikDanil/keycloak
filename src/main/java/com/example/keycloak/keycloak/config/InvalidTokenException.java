@@ -1,4 +1,4 @@
-package com.example.keycloak.config;
+package com.example.keycloak.keycloak.config;
 
 public class InvalidTokenException extends RuntimeException {
 

@@ -1,5 +1,6 @@
-package com.example.keycloak.service;
+package com.example.keycloak.keycloak.service;
 
+import com.example.keycloak.keycloak.model.TokenData;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.codec.binary.Base64;

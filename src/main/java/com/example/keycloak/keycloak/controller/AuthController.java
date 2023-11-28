@@ -1,9 +1,9 @@
-package com.example.keycloak.controller;
+package com.example.keycloak.keycloak.controller;
 
-import com.example.keycloak.service.AuthService;
-import com.example.keycloak.service.TokenData;
-import com.example.keycloak.service.TokenStoreService;
-import com.example.keycloak.util.TokenUtils;
+import com.example.keycloak.keycloak.service.AuthService;
+import com.example.keycloak.keycloak.model.TokenData;
+import com.example.keycloak.keycloak.service.TokenStoreService;
+import com.example.keycloak.keycloak.util.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -42,6 +42,8 @@ public class AuthController {
         }
 
         tokenStoreService.updateTokens(tokenData.getUserId(), tokenData.getAccessToken(), tokenData.getRefreshToken());
+
+        tokenData.setFullName("Иванов Иван Иванович");
         return ResponseEntity.ok().body(tokenData);
     }
 
